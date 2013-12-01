@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+	<title>BALLS! MILLIONS OF THEM</title>
+	<script src="jquery-1.10.2.min.js"></script>
+	<script type="text/javascript">
+		//Class for an animated ball class
+		//x and y are starting positions
+		//r is radius
+		//dx and dy are amount travelled per tick
+		//w and h are width and height of canvas
+		//c is the canvas itself
+		function Ball(x, y, r, dx, dy, w, h,c) {
+		this.x = x;
+		this.y = y;
+		this.r = r;
+		this.dx = dx;
+		this.dy = dy;
+
+		//adjusts the positions of x and y so the appear to move
+		//reverses velocities if they a border
+		this.move = function(){
+			this.x += this.dx;
+			this.y += this.dy;
+
+			if(this.x + this.r > w || this.x - this.r < 0){
+				this.dx = -this.dx;
+			}
+			if(this.y + this.r > h || this.y - this.r < 0){
+				this.dy = -this.dy;
+			}
+		}
+
+		//The ball can draw itself.
+		this.draw = function(){
+			var x = this.x;
+			var y = this.y;
+			var r = this.r;
+
+			c.save();
+			c.translate(x, y);
+			c.beginPath();
+			c.arc(-r / 2, -r / 2, r, 0, 2 * Math.PI, true);
+			c.stroke();
+			//Sets the ball to be a random color and opacity
+			c.fillStyle = "rgba(" + Math.floor((Math.random() * 1000) % 255) + ", " + Math.floor((Math.random() * 1000) % 255) + ", " + Math.floor((Math.random() * 1000) % 255) + "," + Math.random() + ")";
+			c.fill();
+			c.restore();
+		};
+
+		//Clears the screen once every 5 minutes
+		this.reset = function(){
+			var resetTime = 300000;
+			c.clearRect(0, 0, w, h);
+			setInterval(this.reset, resetTime);
+		};
+	};
+	</script>
+	<script type="text/javascript">
+		$(document).ready( function(){
+			var w = window.innerWidth;
+			var h = window.innerHeight;
+			var theCanvas = document.createElement("canvas");
+			theCanvas.setAttribute("id", "pane");
+			theCanvas.setAttribute("width", w);
+			theCanvas.setAttribute("height", h);
+			$("body").append(theCanvas);
+
+			var canvas = document.getElementById('pane');
+			var c = canvas.getContext('2d');
+			w = c.canvas.width;
+			h = c.canvas.height;
+
+			var ball = new Ball(w / 2, h / 2, 20, Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), w, h, c);
+			var cmTID;
+			var resetTime = 60000;
+		var timeStep = 12;	//updates every 25 ms
+		//Animates the ball
+		//Does not clear the canvas because the trail is cool
+		function update(){
+			ball.move();
+			ball.draw();
+			clearTimeout(cmTID);
+			cmTID = setTimeout(update, timeStep);
+		};
+		ball.reset();
+		update();
+		});
+	</script>
+</head>
+<body>
+</body>
+</html>
